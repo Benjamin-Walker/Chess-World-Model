@@ -1,0 +1,8 @@
+{
+  "arch": "slice",
+  "d_model": 384,
+  "n_layers": 4,
+  "slice_block_size": 8,
+  "slice_init_std": 0.1,
+  "slice_scale": 0.1
+}

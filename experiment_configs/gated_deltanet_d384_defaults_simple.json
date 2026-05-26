@@ -1,0 +1,8 @@
+{
+  "arch": "gated_deltanet",
+  "d_model": 384,
+  "n_layers": 4,
+  "n_heads": 6,
+  "gated_deltanet_head_dim": 48,
+  "gated_deltanet_allow_neg_eigval": true
+}

@@ -1,0 +1,46 @@
+[project]
+name = "world-modelling"
+version = "0.1.0"
+description = "Chess state-tracking world modelling experiments"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "torch-slices",
+    "torch>=2.10,<2.11",
+    "numpy>=2",
+    "wandb>=0.22.0",
+    "chess>=1.11.2",
+    "orjson>=3.11.4",
+]
+
+[project.urls]
+Repository = "https://github.com/Benjamin-Walker/Chess-World-Model"
+Issues = "https://github.com/Benjamin-Walker/Chess-World-Model/issues"
+"Lichess database" = "https://database.lichess.org/"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.0",
+    "matplotlib>=3.8.0",
+]
+mamba = [
+    "mamba-ssm[causal-conv1d]",
+    "setuptools>=61.0.0",
+    "wheel>=0.45.1",
+    "packaging>=24.0",
+    "ninja>=1.11.1.4",
+    "tilelang>=0.1.7.post3",
+    "nvidia-cutlass-dsl==4.4.1",
+    "quack-kernels==0.3.1",
+]
+fla = [
+    "flash-linear-attention",
+]
+
+[tool.uv]
+package = false
+no-build-isolation-package = ["mamba-ssm", "causal-conv1d"]
+
+[tool.uv.sources]
+"mamba-ssm" = { git = "https://github.com/state-spaces/mamba", rev = "b267be48e9e71a3a37310ade04b058625409da2d" }

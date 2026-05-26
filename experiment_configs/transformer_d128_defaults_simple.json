@@ -1,0 +1,6 @@
+{
+  "arch": "transformer",
+  "d_model": 128,
+  "n_layers": 1,
+  "n_heads": 2
+}

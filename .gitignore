@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+.venv*/
+
+# Local experiment data
+data/raw/
+data/processed/
+data/test/
+*.pgn
+*.pgn.zst
+*.jsonl
+*.jsonl.zst
+*.csv.zst
+!tests/fixtures/**/*.jsonl
+
+# Training and evaluation outputs
+checkpoints/
+logs_slurm/
+wandb/
+test_eval/
+triton_cache/
+experiment_configs/hypopt_chess_epoch1/
+experiment_configs/paper_hypopt_configs/
+
+# Model and archive artifacts
+*.pt
+*.pth
+*.safetensors
+*.zip
+*.tar
+*.tar.gz
+*.tgz

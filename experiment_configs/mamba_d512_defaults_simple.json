@@ -1,0 +1,6 @@
+{
+  "arch": "mamba",
+  "d_model": 512,
+  "n_layers": 6,
+  "mamba_variant": "mamba-3"
+}
