@@ -7,7 +7,7 @@
 <p>
   <a href="./assets/Chess_World_Model.pdf"><strong>Paper PDF</strong></a>
   |
-  <a href="./assets/ChessDataset.pdf"><strong>Dataset figure</strong></a>
+  <a href="./assets/ChessDataset.png"><strong>Dataset figure</strong></a>
   |
   <a href="https://database.lichess.org/"><strong>Lichess database</strong></a>
   |
