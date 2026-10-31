@@ -43,6 +43,7 @@ DEFAULT_EXPERIMENT_CONFIG = {
     "overfit_iters": 300,
     "val_fraction": 0.005,
     "split_mod": 10000,
+    "validation_ids": None,
     "val_every": 20000,
     "val_batches": 10,
     "val_batch_size": None,
@@ -248,6 +249,14 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--split_mod", type=int, help="Hash bucket modulus for train/val split."
+    )
+    p.add_argument(
+        "--validation_ids",
+        type=str,
+        help=(
+            "Optional file with one validation example_id per line. "
+            "Overrides the hash-based train/validation assignment."
+        ),
     )
     p.add_argument(
         "--val_every",

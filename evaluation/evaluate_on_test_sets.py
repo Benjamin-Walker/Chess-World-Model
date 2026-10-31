@@ -32,6 +32,16 @@ DEFAULT_TEST_DATASETS = [
         ),
     ),
     (
+        "length_matched_random_10k",
+        str(
+            PROJECT_ROOT
+            / "data"
+            / "test"
+            / "length_matched_random_10k"
+            / "length_matched_random_game_test.jsonl"
+        ),
+    ),
+    (
         "random_uniform_10k",
         str(
             PROJECT_ROOT
@@ -66,7 +76,7 @@ def parse_args() -> argparse.Namespace:
         default=[],
         help=(
             "Optional repeated NAME=PATH test-set override. "
-            "Defaults to the two standard test sets."
+            "Defaults to the three standard test sets."
         ),
     )
     p.add_argument(

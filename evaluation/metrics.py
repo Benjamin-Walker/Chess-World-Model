@@ -328,10 +328,13 @@ def run_validation(
 ) -> dict[str, float]:
     model.eval()
     acc = ValMetricAccumulator(bin_size=bin_size)
+    num_examples = 0
 
     for i, batch in enumerate(val_loader):
         if max_batches is not None and max_batches > 0 and i >= max_batches:
             break
+
+        num_examples += int(batch.moves.shape[0])
 
         moves = batch.moves.to(device, non_blocking=True)
         states = batch.states.to(device, non_blocking=True)
@@ -347,5 +350,11 @@ def run_validation(
             _, loss_metrics, _ = compute_state_loss(out, states, pad_mask)
 
         acc.add_batch(out, states, pad_mask, loss_metrics)
+
+    if num_examples == 0:
+        raise RuntimeError(
+            "Validation was enabled, but the validation loader yielded zero examples. "
+            "Check the validation split and validation-ID manifest."
+        )
 
     return acc.summary()

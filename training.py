@@ -9,7 +9,7 @@ from typing import Optional
 
 import torch
 import torch.nn as nn
-from data.loading import ChessJsonlIterableDataset, make_collate_fn
+from data.loading import ChessJsonlIterableDataset, load_validation_ids, make_collate_fn
 from evaluation.metrics import compute_state_loss, print_val_report, run_validation
 from models.factory import (
     build_world_model,
@@ -283,6 +283,9 @@ def train(args: argparse.Namespace, spec: dict, shards: list[str]):
     pad_move_id = int(spec["pad_move_id"])
 
     collate_fn = make_collate_fn(pad_move_id=pad_move_id, max_steps=args.max_steps)
+    validation_ids = (
+        load_validation_ids(args.validation_ids) if args.validation_ids else None
+    )
 
     train_ds = ChessJsonlIterableDataset(
         shards=shards,
@@ -292,6 +295,7 @@ def train(args: argparse.Namespace, spec: dict, shards: list[str]):
         split="train",
         val_fraction=args.val_fraction,
         split_mod=args.split_mod,
+        validation_ids=validation_ids,
     )
 
     val_ds = ChessJsonlIterableDataset(
@@ -302,6 +306,7 @@ def train(args: argparse.Namespace, spec: dict, shards: list[str]):
         split="val",
         val_fraction=args.val_fraction,
         split_mod=args.split_mod,
+        validation_ids=validation_ids,
     )
 
     def make_train_loader(epoch: int) -> DataLoader:
@@ -344,6 +349,17 @@ def train(args: argparse.Namespace, spec: dict, shards: list[str]):
 
     if args.resume:
         ckpt = torch.load(args.resume, map_location=device, weights_only=False)
+        checkpoint_args = ckpt.get("args", {})
+        checkpoint_validation_ids = (
+            checkpoint_args.get("validation_ids")
+            if isinstance(checkpoint_args, dict)
+            else getattr(checkpoint_args, "validation_ids", None)
+        )
+        if checkpoint_validation_ids and not args.validation_ids:
+            raise ValueError(
+                "This checkpoint used a validation-ID manifest. Pass "
+                "--validation_ids again when resuming to preserve its split."
+            )
         model.load_state_dict(ckpt["model"], strict=True)
         optim.load_state_dict(ckpt["optim"])
         if lr_scheduler is not None and "lr_scheduler" in ckpt:
@@ -455,6 +471,10 @@ def train(args: argparse.Namespace, spec: dict, shards: list[str]):
         f"[info] val_fraction={args.val_fraction} "
         f"split_mod={args.split_mod} bin_size={args.bin_size}"
     )
+    if validation_ids is not None:
+        print(
+            f"[info] validation_ids={args.validation_ids} count={len(validation_ids):,}"
+        )
     print(
         "[info] optimiser: "
         f"lr={args.lr} weight_decay={args.weight_decay} beta2={args.beta2}"
