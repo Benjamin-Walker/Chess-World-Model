@@ -17,6 +17,7 @@ dependencies = [
 [project.urls]
 Repository = "https://github.com/Benjamin-Walker/Chess-World-Model"
 Issues = "https://github.com/Benjamin-Walker/Chess-World-Model/issues"
+Dataset = "https://doi.org/10.7910/DVN/C8TEVB"
 "Lichess database" = "https://database.lichess.org/"
 
 [dependency-groups]

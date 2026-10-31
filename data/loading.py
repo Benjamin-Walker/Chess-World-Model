@@ -6,7 +6,7 @@ import os
 import random
 from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Optional
+from typing import AbstractSet, Optional
 
 import orjson
 import torch
@@ -17,6 +17,17 @@ def stable_id_bucket(id_str: str, mod: int = 10000) -> int:
     h = hashlib.md5(id_str.encode("utf-8")).digest()
     x = int.from_bytes(h[:8], "little", signed=False)
     return x % mod
+
+
+def load_validation_ids(path: str) -> frozenset[str]:
+    with open(path, encoding="utf-8") as f:
+        values = [line.strip() for line in f if line.strip()]
+    if not values:
+        raise ValueError(f"Validation ID manifest is empty: {path}")
+    ids = frozenset(values)
+    if len(ids) != len(values):
+        raise ValueError(f"Validation ID manifest contains duplicates: {path}")
+    return ids
 
 
 def find_shards(data_path: str) -> list[str]:
@@ -59,7 +70,7 @@ class ChessJsonlIterableDataset(IterableDataset):
     Supports:
       - shard shuffling per epoch
       - truncation by max_steps
-      - deterministic train/val split by stable hash of example_id
+      - deterministic train/val split by manifest or stable hash of example_id
     """
 
     def __init__(
@@ -71,6 +82,7 @@ class ChessJsonlIterableDataset(IterableDataset):
         split: str = "train",  # "train" or "val" or "all"
         val_fraction: float = 0.01,
         split_mod: int = 10000,
+        validation_ids: Optional[AbstractSet[str]] = None,
     ):
         super().__init__()
         self.shards = list(shards)
@@ -80,6 +92,9 @@ class ChessJsonlIterableDataset(IterableDataset):
         self.split = split
         self.val_fraction = float(val_fraction)
         self.split_mod = int(split_mod)
+        self.validation_ids = (
+            frozenset(validation_ids) if validation_ids is not None else None
+        )
         self._epoch = 0
 
         if self.split not in ("train", "val", "all"):
@@ -95,8 +110,11 @@ class ChessJsonlIterableDataset(IterableDataset):
     def _keep_example(self, ex_id: str) -> bool:
         if self.split == "all":
             return True
-        b = stable_id_bucket(ex_id, mod=self.split_mod)
-        is_val = b < self.val_k
+        if self.validation_ids is not None:
+            is_val = ex_id in self.validation_ids
+        else:
+            b = stable_id_bucket(ex_id, mod=self.split_mod)
+            is_val = b < self.val_k
         return is_val if self.split == "val" else (not is_val)
 
     def _iter_examples_from_shard(self, shard_path: str) -> Iterable[dict]:
